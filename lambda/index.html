@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lambda - Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header id="topnav">
+    <div class="topnav-logo">
+      <img src="icons/favicon.svg" alt="Lambda" class="topnav-icon" />
+      <span class="topnav-version">v1.1.0</span>
+    </div>
+    <nav class="topnav-links">
+      <a href="#introduction" class="topnav-link active">Getting Started</a>
+      <a href="#variables" class="topnav-link">Language</a>
+      <a href="#host-api" class="topnav-link">Host API</a>
+      <a href="#stdlib-io" class="topnav-link">Stdlib</a>
+    </nav>
+    <button id="menu-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div id="shell">
+    <nav id="sidebar">
+      <span class="nav-group-label">Getting Started</span>
+<ul class="nav-list">
+  <li><a href="#introduction" class="nav-link">Introduction</a></li>
+  <li><a href="#quick-start" class="nav-link">Quick Start</a></li>
+  <li><a href="#installation" class="nav-link">Installation</a></li>
+</ul>
+<div class="sidebar-rule"></div>
+<span class="nav-group-label">Language</span>
+<ul class="nav-list">
+  <li><a href="#variables" class="nav-link">Variables</a></li>
+  <li><a href="#functions" class="nav-link">Functions &amp; Closures</a></li>
+  <li><a href="#control-flow" class="nav-link">Control Flow</a></li>
+  <li><a href="#arrays" class="nav-link">Arrays</a></li>
+  <li><a href="#structs" class="nav-link">Structs</a></li>
+  <li><a href="#pointers" class="nav-link">Pointers</a></li>
+  <li><a href="#strings" class="nav-link">String Interpolation</a></li>
+  <li><a href="#error-handling" class="nav-link">Error Handling</a></li>
+  <li><a href="#operators" class="nav-link">Operators</a></li>
+</ul>
+<div class="sidebar-rule"></div>
+<span class="nav-group-label">Host API</span>
+<ul class="nav-list">
+  <li><a href="#host-api" class="nav-link">Overview</a></li>
+  <li><a href="#environment" class="nav-link">Environment</a></li>
+  <li><a href="#registration" class="nav-link">Registration</a></li>
+  <li><a href="#execution" class="nav-link">Execution</a></li>
+</ul>
+<div class="sidebar-rule"></div>
+<span class="nav-group-label">Standard Library</span>
+<ul class="nav-list">
+  <li><a href="#stdlib-io" class="nav-link">I/O &amp; Types</a></li>
+  <li><a href="#stdlib-math" class="nav-link">Math</a></li>
+  <li><a href="#stdlib-string" class="nav-link">String</a></li>
+  <li><a href="#stdlib-array" class="nav-link">Array</a></li>
+  <li><a href="#stdlib-struct" class="nav-link">Struct</a></li>
+</ul>
+
+    </nav>
+    <main id="content">
+      <section id="introduction">
+<div class="hero">
+  <div class="hero-eyebrow">Scripting for GameMaker Studio 2</div>
+  <img src="icons/wordmark.svg" alt="Lambda" class="hero-wordmark" />
+  <p class="hero-subtitle">A lightweight, embeddable scripting language for GMS2.</p>
+  <div class="hero-badges">
+    <span class="badge">GMS2</span>
+    <span class="badge">v1.1.0</span>
+    <span class="badge badge-gold">.lam</span>
+  </div>
+</div>
+<p>Lambda is a dynamically-typed scripting language designed to run inside <strong>GameMaker Studio 2</strong> games, the same way Lua powers modding in other engines.</p>
+<div class="callout callout-gold"><strong>What Lambda is not:</strong> Lambda does not replace GML. It runs alongside it. Lambda scripts are sandboxed guests that interact only through the functions and constants <strong>you</strong> register.</div>
+</section>
+
+<section id="quick-start">
+<div class="section-header">
+  <div class="section-label">Getting Started</div>
+  <h2 class="section-title">Quick Start<a href="#quick-start" class="section-link" title="Copy link to this section" data-id="quick-start">#</a></h2>
+</div>
+<p>Set up Lambda running in your project in minutes.</p>
+<h3>1. Create an environment</h3>
+<pre data-lang="gml"><code class="lang-gml">var env = lambda_env();
+lambda_register_stdlib(env);</code></pre>
+<h3>2. Expose your game to mod scripts</h3>
+<pre data-lang="gml"><code class="lang-gml">// Expose a function
+lambda_register_function(env, &quot;spawn&quot;, function(_args) {
+    instance_create_layer(_args[0], _args[1], &quot;Instances&quot;, obj_enemy);
+});
+
+// Expose a static constant
+lambda_register_constant(env, &quot;TILE_SIZE&quot;, 32);
+
+// Expose a live game value (re-read on every access)
+lambda_register_dynamic_constant(env, &quot;player_x&quot;, function() {
+    return obj_player.x;
+});</code></pre>
+<h3>3. Run a script</h3>
+<pre data-lang="gml"><code class="lang-gml">// From a .lam file bundled in Included Files
+lambda_run_file(env, &quot;mod.lam&quot;);
+
+// Or from a string
+lambda_run(env, &quot;print($\&quot;player is at {player_x}\&quot;);&quot;);</code></pre>
+<h3>4. Call Lambda functions from GML</h3>
+<pre data-lang="gml"><code class="lang-gml">// Grab as a reusable GML callable
+var on_update = lambda_grab_func(env, &quot;on_update&quot;);
+on_update(delta_time);
+
+// Or one-shot call by name
+lambda_call(env, &quot;on_hit&quot;, other.id, damage);</code></pre>
+<h3>5. Clean up</h3>
+<pre data-lang="gml"><code class="lang-gml">lambda_env_destroy(env);</code></pre>
+</section>
+
+<section id="installation">
+<div class="section-header">
+  <div class="section-label">Getting Started</div>
+  <h2 class="section-title">Installation<a href="#installation" class="section-link" title="Copy link to this section" data-id="installation">#</a></h2>
+</div>
+<p>Lambda ships as a GMS2 extension. Add the <code>.yymps</code> to your project, then place <code>.lam</code> files in <strong>Included Files</strong> so they're bundled with your game build.</p>
+<div class="callout"><strong>VS Code Extension:</strong> Full editor support is available - syntax highlighting, real-time linting for undeclared/unused variables, auto-formatting, and minification.</div>
+</section>
+
+<section id="variables">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Variables<a href="#variables" class="section-link" title="Copy link to this section" data-id="variables">#</a></h2>
+</div>
+<p>All variables are declared with <code>let</code>. Lambda is dynamically typed - a variable can hold any value type.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let x = 10;
+let name = &quot;hello&quot;;
+let flag = true;
+let nothing = null;</code></pre>
+<p>Variables are scoped to the block they're declared in. There is no hoisting.</p>
+</section>
+
+<section id="functions">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Functions &amp; Closures<a href="#functions" class="section-link" title="Copy link to this section" data-id="functions">#</a></h2>
+</div>
+<p>Functions are created with the <code>func</code> keyword and assigned to variables.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let add = func(a, b) {
+    return a + b;
+};
+
+let result = add(3, 4); // 7</code></pre>
+<h3>Higher-order functions</h3>
+<pre data-lang="lambda"><code class="lang-lambda">let apply = func(f, x) { return f(x); };
+
+let double = func(n) { return n * 2; };
+apply(double, 5); // 10</code></pre>
+<h3>Closures</h3>
+<p>Functions capture their enclosing scope. This enables patterns like counters and factories.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let make_counter = func() {
+    let n = 0;
+    return func() {
+        n += 1;
+        return n;
+    };
+};
+
+let counter = make_counter();
+counter(); // 1
+counter(); // 2
+counter(); // 3</code></pre>
+</section>
+
+<section id="control-flow">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Control Flow<a href="#control-flow" class="section-link" title="Copy link to this section" data-id="control-flow">#</a></h2>
+</div>
+<h3>If / else</h3>
+<pre data-lang="lambda"><code class="lang-lambda">if (x &gt; 5) {
+    print(&quot;big&quot;);
+} else if (x == 3) {
+    print(&quot;three&quot;);
+} else {
+    print(&quot;small&quot;);
+}</code></pre>
+<h3>While loop</h3>
+<pre data-lang="lambda"><code class="lang-lambda">let x = 5;
+while (x &gt; 0) {
+    print(x);
+    x -= 1;
+}</code></pre>
+<h3>C-style for loop</h3>
+<pre data-lang="lambda"><code class="lang-lambda">for (let i = 0; i &lt; 10; i += 1) {
+    print(i);
+}</code></pre>
+<h3>For-in loop</h3>
+<p>Iterate over every element of an array.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let items = [&quot;sword&quot;, &quot;shield&quot;, &quot;potion&quot;];
+for (let item in items) {
+    print(item);
+}</code></pre>
+<h3>Break & Continue</h3>
+<pre data-lang="lambda"><code class="lang-lambda">for (let i = 0; i &lt; 10; i += 1) {
+    if (i == 3) { continue; }
+    if (i == 7) { break; }
+    print(i);
+}</code></pre>
+</section>
+
+<section id="arrays">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Arrays<a href="#arrays" class="section-link" title="Copy link to this section" data-id="arrays">#</a></h2>
+</div>
+<p>Arrays are zero-indexed and dynamically sized.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let arr = [1, 2, 3];
+
+arr[0] = 99;
+let len = array_length(arr); // 3
+
+array_push(arr, 4);
+array_pop(arr); // removes and returns 4
+
+// Functional operations
+let doubled = array_map(arr, func(v) { return v * 2; });
+let evens   = array_filter(arr, func(v) { return v % 2 == 0; });
+let sum     = array_reduce(arr, func(acc, v) { return acc + v; }, 0);</code></pre>
+</section>
+
+<section id="structs">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Structs<a href="#structs" class="section-link" title="Copy link to this section" data-id="structs">#</a></h2>
+</div>
+<p>Structs are key-value containers. Access fields with dot notation or bracket notation.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let pt = { x: 10, y: 20 };
+
+pt.x = 50;
+pt[&quot;y&quot;] = 80;
+
+struct_has(pt, &quot;x&quot;);  // true
+struct_keys(pt);      // [&quot;x&quot;, &quot;y&quot;]
+struct_delete(pt, &quot;y&quot;);
+
+// Merging (override wins on conflict)
+let base     = { hp: 100, speed: 5 };
+let override = { speed: 8, name: &quot;knight&quot; };
+let unit = struct_merge(base, override);
+// { hp: 100, speed: 8, name: &quot;knight&quot; }</code></pre>
+<div class="callout"><strong>Internal note:</strong> Struct keys are prefixed with <code>_</code> in GML to avoid reserved-word collisions. This is fully transparent inside Lambda - you never see the prefix.</div>
+<h3>Chained access</h3>
+<pre data-lang="lambda"><code class="lang-lambda">let val = game.entities[0].name;</code></pre>
+</section>
+
+<section id="pointers">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Pointers<a href="#pointers" class="section-link" title="Copy link to this section" data-id="pointers">#</a></h2>
+</div>
+<p>The <code>>=></code> operator creates a <strong>live reference</strong> to a struct field or array index. Reading the pointer variable automatically dereferences it - you always get the current value, not a snapshot.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let pos = { x: 0, y: 0 };
+let px &gt;=&gt; pos.x;
+
+pos.x = 5;
+print(px);  // 5  - reflects live state
+
+pos.x = 99;
+print(px);  // 99</code></pre>
+<h3>Array pointer</h3>
+<pre data-lang="lambda"><code class="lang-lambda">let arr = [10, 20, 30];
+let p1 &gt;=&gt; arr[1];
+
+arr[1] = 99;
+print(p1);  // 99</code></pre>
+</section>
+
+<section id="strings">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">String Interpolation<a href="#strings" class="section-link" title="Copy link to this section" data-id="strings">#</a></h2>
+</div>
+<p>Prefix a string literal with <code>$</code> to embed expressions inside <code>{}</code>.</p>
+<pre data-lang="lambda"><code class="lang-lambda">let name = &quot;World&quot;;
+print($&quot;Hello, {name}!&quot;);        // Hello, World!
+
+let a = 3;
+let b = 4;
+print($&quot;{a} + {b} = {a + b}&quot;);  // 3 + 4 = 7
+
+// Any expression works inside {}
+print($&quot;Type: {type_of(name)}&quot;);</code></pre>
+</section>
+
+<section id="error-handling">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Error Handling<a href="#error-handling" class="section-link" title="Copy link to this section" data-id="error-handling">#</a></h2>
+</div>
+<pre data-lang="lambda"><code class="lang-lambda">try {
+    throw &quot;something went wrong&quot;;
+} catch (err) {
+    print($&quot;Caught: {err}&quot;);
+}
+
+// Throw any value
+try {
+    throw { code: 404, msg: &quot;not found&quot; };
+} catch (err) {
+    print(err.msg);
+}
+
+// Assert (throws on false)
+assert(x &gt; 0, &quot;x must be positive&quot;);</code></pre>
+</section>
+
+<section id="operators">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Operators<a href="#operators" class="section-link" title="Copy link to this section" data-id="operators">#</a></h2>
+</div>
+<table class="op-table">
+  <thead>
+    <tr><th>Category</th><th>Operators</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Arithmetic</td><td><code>+ - * / %</code></td><td><code>+</code> also concatenates strings</td></tr>
+    <tr><td>Comparison</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td><td></td></tr>
+    <tr><td>Logical</td><td><code>&amp;&amp; || !</code></td><td></td></tr>
+    <tr><td>Assignment</td><td><code>= += -= *= /=</code></td><td></td></tr>
+    <tr><td>Pointer</td><td><code>&gt;=&gt;</code></td><td>Creates a live reference</td></tr>
+  </tbody>
+</table>
+
+</section>
+
+<section id="host-api">
+<div class="section-header">
+  <div class="section-label">Host API</div>
+  <h2 class="section-title">Host API Overview<a href="#host-api" class="section-link" title="Copy link to this section" data-id="host-api">#</a></h2>
+</div>
+<p>The Host API is the GML-side interface - the set of functions you call from your game to create environments, register names, and execute Lambda scripts.</p>
+<div class="api-grid">
+  <div class="api-card">
+    <div class="api-card-label">Environment</div>
+    <code>lambda_env()</code>
+    <code>lambda_env_destroy(env)</code>
+  </div>
+  <div class="api-card">
+    <div class="api-card-label">Registration</div>
+    <code>lambda_register_function(env, name, fn)</code>
+    <code>lambda_register_constant(env, name, val)</code>
+    <code>lambda_register_dynamic_constant(env, name, getter)</code>
+    <code>lambda_register_stdlib(env)</code>
+  </div>
+  <div class="api-card">
+    <div class="api-card-label">Execution</div>
+    <code>lambda_run(env, source)</code>
+    <code>lambda_run_file(env, path)</code>
+    <code>lambda_precompile(env, source)</code>
+    <code>lambda_chunk_run(env, chunk)</code>
+  </div>
+  <div class="api-card">
+    <div class="api-card-label">Calling Lambda</div>
+    <code>lambda_grab_func(env, name)</code>
+    <code>lambda_call(env, name, arg0, ...)</code>
+  </div>
+</div>
+
+</section>
+
+<section id="environment">
+<div class="section-header">
+  <div class="section-label">Host API</div>
+  <h2 class="section-title">Environment<a href="#environment" class="section-link" title="Copy link to this section" data-id="environment">#</a></h2>
+</div>
+<p>An environment is an isolated execution context. Scripts running in separate environments cannot see each other's variables or registered names.</p>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_env</span>() <span class="fn-ret">→ env struct</span></div><p>Creates and returns a new Lambda environment. Always call <code>lambda_register_stdlib</code> after creation unless you want a fully bare sandbox.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_env_destroy</span>(env)</div><p>Destroys the environment and frees all associated memory. Call this when the environment is no longer needed - e.g., when a level ends or a mod is unloaded.</p></div>
+<pre data-lang="gml"><code class="lang-gml">var env = lambda_env();
+lambda_register_stdlib(env);
+// ... use env ...
+lambda_env_destroy(env);</code></pre>
+</section>
+
+<section id="registration">
+<div class="section-header">
+  <div class="section-label">Host API</div>
+  <h2 class="section-title">Registration<a href="#registration" class="section-link" title="Copy link to this section" data-id="registration">#</a></h2>
+</div>
+<p>Registration is how you expose your game's API to Lambda scripts. Only names you explicitly register are accessible - nothing else leaks through.</p>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_function</span>(env, name, gml_func)</div><p>Registers a GML function under a name callable from Lambda. The function receives its arguments as a GML array <code>_args</code>.</p></div>
+<pre data-lang="gml"><code class="lang-gml">lambda_register_function(env, &quot;damage_player&quot;, function(_args) {
+    obj_player.hp -= _args[0];
+});</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_constant</span>(env, name, value)</div><p>Registers a static constant. The value is read once at registration time.</p></div>
+<pre data-lang="gml"><code class="lang-gml">lambda_register_constant(env, &quot;MAX_ENEMIES&quot;, 50);</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_dynamic_constant</span>(env, name, getter_func)</div><p>Registers a dynamic constant backed by a getter. The getter is called every time the name is read in Lambda - ideal for live game state.</p></div>
+<pre data-lang="gml"><code class="lang-gml">lambda_register_dynamic_constant(env, &quot;enemy_count&quot;, function() {
+    return instance_number(obj_enemy);
+});</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_stdlib</span>(env)</div><p>Registers the full Lambda standard library into the environment. Call once after <code>lambda_env()</code> unless you want a minimal sandbox.</p></div>
+</section>
+
+<section id="execution">
+<div class="section-header">
+  <div class="section-label">Host API</div>
+  <h2 class="section-title">Execution<a href="#execution" class="section-link" title="Copy link to this section" data-id="execution">#</a></h2>
+</div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_run</span>(env, source_string) <span class="fn-ret">→ value</span></div><p>Compiles and runs a Lambda source string. Returns the last evaluated value.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_run_file</span>(env, path) <span class="fn-ret">→ value</span></div><p>Loads and runs a <code>.lam</code> file.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_precompile</span>(env, source_string) <span class="fn-ret">→ chunk</span></div><p>Compiles a source string into a reusable chunk. Faster than re-parsing the same script repeatedly.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_chunk_run</span>(env, chunk) <span class="fn-ret">→ value</span></div><p>Executes a pre-compiled chunk.</p></div>
+<pre data-lang="gml"><code class="lang-gml">var chunk = lambda_precompile(env, &quot;player_x + 10&quot;);
+// Call every frame cheaply:
+var result = lambda_chunk_run(env, chunk);</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_grab_func</span>(env, name) <span class="fn-ret">→ GML callable</span></div><p>Returns a Lambda-defined function as a native GML callable. Use this to call into Lambda from your game loop without string lookups each time.</p></div>
+<pre data-lang="gml"><code class="lang-gml">var on_update = lambda_grab_func(env, &quot;on_update&quot;);
+// In your Step event:
+on_update(delta_time);</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_call</span>(env, name, arg0, arg1, ...) <span class="fn-ret">→ value</span></div><p>Calls a Lambda function by name with arguments. Convenient for one-off calls.</p></div>
+<pre data-lang="gml"><code class="lang-gml">lambda_call(env, &quot;on_hit&quot;, other.id, damage);</code></pre>
+</section>
+
+<section id="stdlib-io">
+<div class="section-header">
+  <div class="section-label">Standard Library</div>
+  <h2 class="section-title">I/O &amp; Types<a href="#stdlib-io" class="section-link" title="Copy link to this section" data-id="stdlib-io">#</a></h2>
+</div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">print</span>(v)</div><p>Outputs <code>v</code> to the debug console.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">to_string</span>(v) <span class="fn-ret">→ string</span></div><p>Converts any value to its string representation.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">to_number</span>(v) <span class="fn-ret">→ number</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">to_bool</span>(v) <span class="fn-ret">→ bool</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">type_of</span>(v) <span class="fn-ret">→ string</span></div><p>Returns: <code>"null"</code> <code>"bool"</code> <code>"number"</code> <code>"string"</code> <code>"array"</code> <code>"struct"</code> <code>"function"</code> <code>"pointer"</code> <code>"unknown"</code></p></div>
+<h3>Type checks</h3>
+<p>All return <code>bool</code>: <code>is_null</code> &nbsp; <code>is_number</code> &nbsp; <code>is_string</code> &nbsp; <code>is_bool</code> &nbsp; <code>is_array</code> &nbsp; <code>is_struct</code> &nbsp; <code>is_function</code> &nbsp; <code>is_pointer</code></p>
+<h3>Misc</h3>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">assert</span>(cond [, msg])</div><p>Throws if <code>cond</code> is falsy.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">error</span>(msg)</div><p>Unconditionally throws <code>msg</code>.</p></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">range</span>(start, stop [, step]) <span class="fn-ret">→ array</span></div></div>
+<pre data-lang="lambda"><code class="lang-lambda">range(0, 5);      // [0, 1, 2, 3, 4]
+range(0, 10, 2);  // [0, 2, 4, 6, 8]</code></pre>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">zip</span>(arr_a, arr_b) <span class="fn-ret">→ array of [a,b] pairs</span></div></div>
+<pre data-lang="lambda"><code class="lang-lambda">zip([1,2,3], [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;]);
+// [[1,&quot;a&quot;], [2,&quot;b&quot;], [3,&quot;c&quot;]]</code></pre>
+</section>
+
+<section id="stdlib-math">
+<div class="section-header">
+  <div class="section-label">Standard Library</div>
+  <h2 class="section-title">Math<a href="#stdlib-math" class="section-link" title="Copy link to this section" data-id="stdlib-math">#</a></h2>
+</div>
+<div class="fn-group">
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">abs</span>(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">floor</span>(n) / ceil(n) / round(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">sqrt</span>(n) / pow(b, e) / sign(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">sin</span>(n) / cos(n) / tan(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">arcsin</span>(n) / arccos(n) / arctan(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">arctan2</span>(y, x)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">log2</span>(n) / log10(n) / ln(n) / exp(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">min</span>(a, b) / max(a, b)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">clamp</span>(v, lo, hi) / lerp(a, b, t)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">random</span>(n) / irandom(n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">random_range</span>(lo, hi) / irandom_range(lo, hi)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">distance</span>(x1, y1, x2, y2) / angle_between(x1, y1, x2, y2)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">deg_to_rad</span>(d) / rad_to_deg(r)</div></div>
+</div>
+<h3>Constants</h3>
+<div class="const-row">
+  <span class="const-name">PI</span>
+  <span class="const-name">INF</span>
+  <span class="const-name">NAN</span>
+  <span class="const-name">LAMBDA_VERSION</span>
+</div>
+</section>
+
+<section id="stdlib-string">
+<div class="section-header">
+  <div class="section-label">Standard Library</div>
+  <h2 class="section-title">String<a href="#stdlib-string" class="section-link" title="Copy link to this section" data-id="stdlib-string">#</a></h2>
+</div>
+<div class="fn-group">
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_length</span>(s) <span class="fn-ret">→ number</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_upper</span>(s) / str_lower(s)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_sub</span>(s, start, len) <span class="fn-ret">→ string</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_pos</span>(needle, haystack) <span class="fn-ret">→ number</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_replace</span>(s, from, to) <span class="fn-ret">→ string</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_char_at</span>(s, i) <span class="fn-ret">→ string</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_ord</span>(c) <span class="fn-ret">→ number / str_chr(n) → string</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_trim</span>(s) / str_repeat(s, n)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_pad_left</span>(s, width, char) / str_pad_right(s, width, char)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_split</span>(s, sep) <span class="fn-ret">→ array</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_starts_with</span>(s, prefix) <span class="fn-ret">→ bool</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_ends_with</span>(s, suffix) <span class="fn-ret">→ bool</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">str_contains</span>(s, sub) <span class="fn-ret">→ bool</span></div></div>
+</div>
+</section>
+
+<section id="stdlib-array">
+<div class="section-header">
+  <div class="section-label">Standard Library</div>
+  <h2 class="section-title">Array<a href="#stdlib-array" class="section-link" title="Copy link to this section" data-id="stdlib-array">#</a></h2>
+</div>
+<div class="fn-group">
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_length</span>(arr) <span class="fn-ret">→ number</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_push</span>(arr, v) / array_pop(arr)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_insert</span>(arr, i, v) / array_delete(arr, i)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_slice</span>(arr, start [, end]) <span class="fn-ret">→ array</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_reverse</span>(arr) / array_sort(arr)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_sort_fn</span>(arr, func(a,b){...})</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_join</span>(arr [, sep]) <span class="fn-ret">→ string</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_contains</span>(arr, v) <span class="fn-ret">→ bool</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_find</span>(arr, v) <span class="fn-ret">→ number</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_map</span>(arr, fn) / array_filter(arr, fn)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_each</span>(arr, fn)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_reduce</span>(arr, fn, init)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">array_flat</span>(arr) <span class="fn-ret">→ array</span></div></div>
+</div>
+</section>
+
+<section id="stdlib-struct">
+<div class="section-header">
+  <div class="section-label">Standard Library</div>
+  <h2 class="section-title">Struct<a href="#stdlib-struct" class="section-link" title="Copy link to this section" data-id="stdlib-struct">#</a></h2>
+</div>
+<div class="fn-group">
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">struct_has</span>(s, key) <span class="fn-ret">→ bool</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">struct_keys</span>(s) <span class="fn-ret">→ array</span></div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">struct_delete</span>(s, key)</div></div>
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">struct_merge</span>(base, override) <span class="fn-ret">→ struct</span></div></div>
+</div>
+</section>
+
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "lambda-lang-docs",
+  "version": "1.1.0",
+  "description": "Documentation site for the Lambda scripting language",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node -e \"const{execSync}=require('child_process');const fs=require('fs');fs.watch('./sections',()=>{console.log('Rebuilding...');execSync('node build.js',{stdio:'inherit'})});console.log('Watching sections/ for changes...');execSync('node build.js',{stdio:'inherit'});\""
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^2.22.0"
+  }
+}

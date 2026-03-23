@@ -1,0 +1,39 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lambda/sections/**'
+      - 'lambda/build.js'
+      - 'lambda/style.css'
+      - 'lambda/script.js'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build
+        run: node build.js
+        working-directory: lambda
+
+      - name: Commit index.html
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add lambda/index.html
+          git diff --staged --quiet || git commit -m "build: regenerate index.html"
+          git push
