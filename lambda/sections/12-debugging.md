@@ -2,7 +2,7 @@
 id: lambda-debug
 title: LAMBDA_DEBUG
 nav: LAMBDA_DEBUG
-group: Reference
+group: Language
 ---
 
 The `LAMBDA_DEBUG` macro in `lambda.gml` controls the verbosity of runtime and compile-time error messages. It defaults to `false`.

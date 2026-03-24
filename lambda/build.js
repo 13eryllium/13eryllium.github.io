@@ -161,7 +161,7 @@ function renderBody(body) {
   <p class="hero-subtitle">A lightweight, embeddable scripting language for GMS2.</p>
   <div class="hero-badges">
     <span class="badge">GMS2</span>
-    <span class="badge">v1.1.0</span>
+    <span class="badge">v1.2.0</span>
     <span class="badge badge-gold">.lam</span>
   </div>
 </div>\n`;
