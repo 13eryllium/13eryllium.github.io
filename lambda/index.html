@@ -328,7 +328,10 @@ lambda_env_tick(env);</code></pre>
 </div>
 <p>The <code>LAMBDA_DEBUG</code> macro in <code>lambda.gml</code> controls the verbosity of runtime and compile-time error messages. It defaults to <code>false</code>.</p>
 <pre data-lang="gml"><code class="lang-gml">#macro LAMBDA_DEBUG false</code></pre>
-<p><code>false</code>: Short, production-friendly error messages. <code>true</code>: Extended context added at every pipeline stage.</p>
+<ul>
+  <li><code>false</code>: Short, production-friendly error messages.</li>
+  <li><code>true</code>: Extended context added at every pipeline stage.</li>
+</ul>
 <p>When enabled, each stage enriches its errors as follows:</p>
 <ul>
   <li><strong>Lexer</strong> — character ordinal value</li>
