@@ -20,7 +20,6 @@
     <nav class="topnav-links">
       <a href="#introduction" class="topnav-link active">Getting Started</a>
       <a href="#variables" class="topnav-link">Language</a>
-      <a href="#lambda-debug" class="topnav-link">Reference</a>
       <a href="#host-api" class="topnav-link">Host API</a>
       <a href="#stdlib-io" class="topnav-link">Stdlib</a>
     </nav>
@@ -48,13 +47,9 @@
   <li><a href="#pointers" class="nav-link">Pointers</a></li>
   <li><a href="#strings" class="nav-link">String Interpolation</a></li>
   <li><a href="#wait-statement" class="nav-link">Wait Statement</a></li>
+  <li><a href="#lambda-debug" class="nav-link">LAMBDA_DEBUG</a></li>
   <li><a href="#error-handling" class="nav-link">Error Handling</a></li>
   <li><a href="#operators" class="nav-link">Operators</a></li>
-</ul>
-<div class="sidebar-rule"></div>
-<span class="nav-group-label">Reference</span>
-<ul class="nav-list">
-  <li><a href="#lambda-debug" class="nav-link">LAMBDA_DEBUG</a></li>
 </ul>
 <div class="sidebar-rule"></div>
 <span class="nav-group-label">Host API</span>
@@ -82,7 +77,7 @@
   <p class="hero-subtitle">A lightweight, embeddable scripting language for GMS2.</p>
   <div class="hero-badges">
     <span class="badge">GMS2</span>
-    <span class="badge">v1.1.0</span>
+    <span class="badge">v1.2.0</span>
     <span class="badge badge-gold">.lam</span>
   </div>
 </div>
@@ -328,7 +323,7 @@ lambda_env_tick(env);</code></pre>
 
 <section id="lambda-debug">
 <div class="section-header">
-  <div class="section-label">Reference</div>
+  <div class="section-label">Language</div>
   <h2 class="section-title">LAMBDA_DEBUG<a href="#lambda-debug" class="section-link" title="Copy link to this section" data-id="lambda-debug">#</a></h2>
 </div>
 <p>The <code>LAMBDA_DEBUG</code> macro in <code>lambda.gml</code> controls the verbosity of runtime and compile-time error messages. It defaults to <code>false</code>.</p>
