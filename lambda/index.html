@@ -20,6 +20,7 @@
     <nav class="topnav-links">
       <a href="#introduction" class="topnav-link active">Getting Started</a>
       <a href="#variables" class="topnav-link">Language</a>
+      <a href="#lambda-debug" class="topnav-link">Reference</a>
       <a href="#host-api" class="topnav-link">Host API</a>
       <a href="#stdlib-io" class="topnav-link">Stdlib</a>
     </nav>
@@ -46,15 +47,20 @@
   <li><a href="#structs" class="nav-link">Structs</a></li>
   <li><a href="#pointers" class="nav-link">Pointers</a></li>
   <li><a href="#strings" class="nav-link">String Interpolation</a></li>
+  <li><a href="#wait-statement" class="nav-link">Wait Statement</a></li>
   <li><a href="#error-handling" class="nav-link">Error Handling</a></li>
   <li><a href="#operators" class="nav-link">Operators</a></li>
+</ul>
+<div class="sidebar-rule"></div>
+<span class="nav-group-label">Reference</span>
+<ul class="nav-list">
+  <li><a href="#lambda-debug" class="nav-link">LAMBDA_DEBUG</a></li>
 </ul>
 <div class="sidebar-rule"></div>
 <span class="nav-group-label">Host API</span>
 <ul class="nav-list">
   <li><a href="#host-api" class="nav-link">Overview</a></li>
   <li><a href="#environment" class="nav-link">Environment</a></li>
-  <li><a href="#registration" class="nav-link">Registration</a></li>
   <li><a href="#execution" class="nav-link">Execution</a></li>
 </ul>
 <div class="sidebar-rule"></div>
@@ -298,6 +304,46 @@ print($&quot;{a} + {b} = {a + b}&quot;);  // 3 + 4 = 7
 print($&quot;Type: {type_of(name)}&quot;);</code></pre>
 </section>
 
+<section id="wait-statement">
+<div class="section-header">
+  <div class="section-label">Language</div>
+  <h2 class="section-title">Wait Statement<a href="#wait-statement" class="section-link" title="Copy link to this section" data-id="wait-statement">#</a></h2>
+</div>
+<p>The <code>wait</code> statement defers a block of code to run after a number of seconds.</p>
+<pre data-lang="lambda"><code class="lang-lambda">wait 3 once {
+    run();
+}
+// run() is called approximately 3 seconds later.</code></pre>
+<h3>Syntax</h3>
+<pre data-lang="lambda"><code class="lang-lambda">wait &lt;expr&gt; once {
+    // body
+}</code></pre>
+<p><code><expr></code> is evaluated immediately and may be any number (decimals allowed). The body is compiled into an anonymous chunk at compile time and executes in the scope that was live when the <code>wait</code> ran.</p>
+<h3>Host integration</h3>
+<p>The host <strong>must</strong> call <code>lambda_env_tick</code> every Step event for waits to fire:</p>
+<pre data-lang="gml"><code class="lang-gml">// Step event or controller object
+lambda_env_tick(env);</code></pre>
+<p>Without this call, pending waits will never execute.</p>
+</section>
+
+<section id="lambda-debug">
+<div class="section-header">
+  <div class="section-label">Reference</div>
+  <h2 class="section-title">LAMBDA_DEBUG<a href="#lambda-debug" class="section-link" title="Copy link to this section" data-id="lambda-debug">#</a></h2>
+</div>
+<p>The <code>LAMBDA_DEBUG</code> macro in <code>lambda.gml</code> controls the verbosity of runtime and compile-time error messages. It defaults to <code>false</code>.</p>
+<pre data-lang="gml"><code class="lang-gml">#macro LAMBDA_DEBUG false</code></pre>
+<p>| Value | Behaviour | |-------|-----------| | <code>false</code> | Short, production-friendly error messages. | | <code>true</code> | Extended context added at every pipeline stage. |</p>
+<p>When enabled, each stage enriches its errors as follows:</p>
+<ul>
+  <li><strong>Lexer</strong> — character ordinal value</li>
+  <li><strong>Parser</strong> — token index; got-value in all <code>expect</code>/<code>unexpected</code> errors</li>
+  <li><strong>Compiler</strong> — chunk name in every thrown message</li>
+  <li><strong>VM</strong> — type and value of offending operands; <code>ip</code> and chunk name for unknown opcodes</li>
+</ul>
+<p>Set to <code>true</code> during development and <code>false</code> before shipping.</p>
+</section>
+
 <section id="error-handling">
 <div class="section-header">
   <div class="section-label">Language</div>
@@ -387,25 +433,6 @@ assert(x &gt; 0, &quot;x must be positive&quot;);</code></pre>
 lambda_register_stdlib(env);
 // ... use env ...
 lambda_env_destroy(env);</code></pre>
-</section>
-
-<section id="registration">
-<div class="section-header">
-  <div class="section-label">Host API</div>
-  <h2 class="section-title">Registration<a href="#registration" class="section-link" title="Copy link to this section" data-id="registration">#</a></h2>
-</div>
-<p>Registration is how you expose your game's API to Lambda scripts. Only names you explicitly register are accessible - nothing else leaks through.</p>
-<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_function</span>(env, name, gml_func)</div><p>Registers a GML function under a name callable from Lambda.</p></div>
-<pre data-lang="gml"><code class="lang-gml">lambda_register_function(env, &quot;damage_player&quot;, function(damage) {
-    obj_player.hp -= damage;
-});</code></pre>
-<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_constant</span>(env, name, value)</div><p>Registers a static constant. The value is read once at registration time.</p></div>
-<pre data-lang="gml"><code class="lang-gml">lambda_register_constant(env, &quot;MAX_ENEMIES&quot;, 50);</code></pre>
-<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_dynamic_constant</span>(env, name, getter_func)</div><p>Registers a dynamic constant backed by a getter. The getter is called every time the name is read in Lambda - ideal for live game state.</p></div>
-<pre data-lang="gml"><code class="lang-gml">lambda_register_dynamic_constant(env, &quot;enemy_count&quot;, function() {
-    return instance_number(obj_enemy);
-});</code></pre>
-<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_stdlib</span>(env)</div><p>Registers the full Lambda standard library into the environment. Call once after <code>lambda_env()</code> unless you want a minimal sandbox.</p></div>
 </section>
 
 <section id="execution">
