@@ -310,10 +310,10 @@ print($&quot;Type: {type_of(name)}&quot;);</code></pre>
 }
 // run() is called approximately 3 seconds later.</code></pre>
 <h3>Syntax</h3>
-<pre data-lang="lambda"><code class="lang-lambda">wait &lt;expr&gt; once {
+<pre data-lang="lambda"><code class="lang-lambda">wait expr once {
     // body
 }</code></pre>
-<p><code><expr></code> is evaluated immediately and may be any number (decimals allowed). The body is compiled into an anonymous chunk at compile time and executes in the scope that was live when the <code>wait</code> ran.</p>
+<p><code>expr</code> is evaluated immediately and may be any number (decimals allowed). The body is compiled into an anonymous chunk at compile time and executes in the scope that was live when the <code>wait</code> ran.</p>
 <h3>Host integration</h3>
 <p>The host <strong>must</strong> call <code>lambda_env_tick</code> every Step event for waits to fire:</p>
 <pre data-lang="gml"><code class="lang-gml">// Step event or controller object
