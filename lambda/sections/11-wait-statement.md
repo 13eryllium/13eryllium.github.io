@@ -15,12 +15,12 @@ wait 3 once {
 
 ### Syntax
 ```lambda
-wait <expr> once {
+wait expr once {
     // body
 }
 ```
 
-`<expr>` is evaluated immediately and may be any number (decimals allowed). The body is compiled into an anonymous chunk at compile time and executes in the scope that was live when the `wait` ran.
+`expr` is evaluated immediately and may be any number (decimals allowed). The body is compiled into an anonymous chunk at compile time and executes in the scope that was live when the `wait` ran.
 
 ### Host integration
 
