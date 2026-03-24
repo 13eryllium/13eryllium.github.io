@@ -95,8 +95,8 @@
 lambda_register_stdlib(env);</code></pre>
 <h3>2. Expose your game to mod scripts</h3>
 <pre data-lang="gml"><code class="lang-gml">// Expose a function
-lambda_register_function(env, &quot;spawn&quot;, function(_args) {
-    instance_create_layer(_args[0], _args[1], &quot;Instances&quot;, obj_enemy);
+lambda_register_function(env, &quot;spawn&quot;, function(layer, instance) {
+    instance_create_layer(layer, instance, &quot;Instances&quot;, obj_enemy);
 });
 
 // Expose a static constant
@@ -395,9 +395,9 @@ lambda_env_destroy(env);</code></pre>
   <h2 class="section-title">Registration<a href="#registration" class="section-link" title="Copy link to this section" data-id="registration">#</a></h2>
 </div>
 <p>Registration is how you expose your game's API to Lambda scripts. Only names you explicitly register are accessible - nothing else leaks through.</p>
-<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_function</span>(env, name, gml_func)</div><p>Registers a GML function under a name callable from Lambda. The function receives its arguments as a GML array <code>_args</code>.</p></div>
-<pre data-lang="gml"><code class="lang-gml">lambda_register_function(env, &quot;damage_player&quot;, function(_args) {
-    obj_player.hp -= _args[0];
+<div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_function</span>(env, name, gml_func)</div><p>Registers a GML function under a name callable from Lambda.</p></div>
+<pre data-lang="gml"><code class="lang-gml">lambda_register_function(env, &quot;damage_player&quot;, function(damage) {
+    obj_player.hp -= damage;
 });</code></pre>
 <div class="fn-block"><div class="fn-sig"><span class="fn-name">lambda_register_constant</span>(env, name, value)</div><p>Registers a static constant. The value is read once at registration time.</p></div>
 <pre data-lang="gml"><code class="lang-gml">lambda_register_constant(env, &quot;MAX_ENEMIES&quot;, 50);</code></pre>
