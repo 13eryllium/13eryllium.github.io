@@ -8,11 +8,11 @@ group: Host API
 Registration is how you expose your game's API to Lambda scripts. Only names you explicitly register are accessible - nothing else leaks through.
 
 ::fn lambda_register_function(env, name, gml_func)
-Registers a GML function under a name callable from Lambda. The function receives its arguments as a GML array `_args`.
+Registers a GML function under a name callable from Lambda.
 
 ```gml
-lambda_register_function(env, "damage_player", function(_args) {
-    obj_player.hp -= _args[0];
+lambda_register_function(env, "damage_player", function(damage) {
+    obj_player.hp -= damage;
 });
 ```
 
