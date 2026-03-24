@@ -10,8 +10,8 @@ The `LAMBDA_DEBUG` macro in `lambda.gml` controls the verbosity of runtime and c
 #macro LAMBDA_DEBUG false
 ```
 
-`false`: Short, production-friendly error messages.
-`true`: Extended context added at every pipeline stage.
+- `false`: Short, production-friendly error messages.
+- `true`: Extended context added at every pipeline stage.
 
 When enabled, each stage enriches its errors as follows:
 
