@@ -96,8 +96,8 @@
 lambda_register_stdlib(env);</code></pre>
 <h3>2. Expose your game to mod scripts</h3>
 <pre data-lang="gml"><code class="lang-gml">// Expose a function
-lambda_register_function(env, &quot;spawn&quot;, function(layer, instance) {
-    instance_create_layer(layer, instance, &quot;Instances&quot;, obj_enemy);
+lambda_register_function(env, &quot;spawn&quot;, function(_x, _y, layer, instance) {
+    instance_create_layer(_x, _y, layer, instance, &quot;Instances&quot;, obj_enemy);
 });
 
 // Expose a static constant
