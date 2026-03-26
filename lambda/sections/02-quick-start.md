@@ -18,8 +18,8 @@ lambda_register_stdlib(env);
 
 ```gml
 // Expose a function
-lambda_register_function(env, "spawn", function(layer, instance) {
-    instance_create_layer(layer, instance, "Instances", obj_enemy);
+lambda_register_function(env, "spawn", function(_x, _y, layer, instance) {
+    instance_create_layer(_x, _y, layer, instance, "Instances", obj_enemy);
 });
 
 // Expose a static constant
